@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Zig-Zag Chart</title>
+    <style>
+      #popup {
+        position: absolute;
+        display: none;
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 12px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        max-width: 250px;
+        z-index: 999;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="plot" style="width: 100%; height: 100vh;"></div>
+    <div id="popup"></div>
+    <script>
+      const data = [{"label": "10 Apr (Sunday)", "Time": NaN, "mood": "a", "emotion": 1, "desc": "d1"}, {"label": "10 Apr (Sunday)", "Time": NaN, "mood": "aaa", "emotion": 111, "desc": "d2"}, {"label": "11 Apr (Monday)", "Time": NaN, "mood": "b", "emotion": 2, "desc": "d3"}, {"label": "11 Apr (Monday)", "Time": NaN, "mood": "bbb", "emotion": 222, "desc": "d4"}, {"label": "12 Apr (Tuesday)", "Time": NaN, "mood": "c", "emotion": 3, "desc": "d5"}, {"label": "12 Apr (Tuesday)", "Time": NaN, "mood": "ccc", "emotion": 333, "desc": "d6"}];
+
+      const labels = data.map(d => `${{d.mood}}, ${{d.emotion}}`);
+      const hoverText = data.map(d => `Click to view: ${{d.desc}}`);
+      const customData = data.map(d => d.desc);
+
+      const trace = {{
+        x: data.map(d => d.label),
+        y: data.map(d => d.time),
+        mode: 'lines+markers+text',
+        type: 'scatter',
+        text: labels,
+        textposition: 'top center',
+        marker: {{ size: 10, color: 'blue' }},
+        hoverinfo: 'text',
+        hovertext: hoverText,
+        customdata: customData,
+      }};
+
+      const layout = {{
+        title: 'Zig-Zag Interactive Mood Tracker',
+        xaxis: {{ title: 'Date', tickangle: -45 }},
+        yaxis: {{ title: 'Time', categoryorder: 'array', categoryarray: ['3:00 PM', '6:00 PM'] }},
+      }};
+
+      Plotly.newPlot('plot', [trace], layout);
+
+      const popup = document.getElementById("popup");
+
+      document.getElementById('plot').on('plotly_click', function(event) {{
+        const point = event.points[0];
+        const desc = point.customdata;
+
+        const x = event.event.clientX;
+        const y = event.event.clientY;
+
+        popup.innerHTML = "<strong>Where were you then?</strong><br>" + desc;
+        popup.style.left = x + 10 + "px";
+        popup.style.top = y + 10 + "px";
+        popup.style.display = "block";
+      }});
+
+      // Hide popup on outside click
+      document.addEventListener('click', function(e) {{
+        if (!popup.contains(e.target)) {{
+          popup.style.display = 'none';
+        }}
+      }});
+    </script>
+  </body>
+</html>
